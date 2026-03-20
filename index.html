@@ -38,7 +38,7 @@ th{color:var(--accent);font-size:.72rem;text-transform:uppercase;letter-spacing:
 .wf-node.active{border-color:var(--accent);box-shadow:0 0 16px rgba(100,255,218,.2)}
 .wf-node.complete{border-color:var(--success)}
 .wf-node.error{border-color:var(--danger)}
-.wf-node .icon{font-size:1.4rem;margin-bottom:6px}
+.wf-node .icon{font-size:.85rem;font-weight:700;color:var(--accent);margin-bottom:6px;letter-spacing:.5px}
 .wf-node .name{font-size:.82rem;font-weight:600;color:#fff}
 .wf-node .type{font-size:.7rem;color:var(--text2);margin-top:2px}
 .wf-node .timing{font-size:.7rem;color:var(--accent);margin-top:4px}
@@ -88,11 +88,11 @@ th{color:var(--accent);font-size:.72rem;text-transform:uppercase;letter-spacing:
   <div class="card" style="margin-bottom:20px">
     <h2>Workflow Templates</h2>
     <div class="template-grid">
-      <div class="template-card" onclick="loadWorkflow('api')"><div style="font-size:1.5rem">🌐</div><div class="t-name">REST API</div><div class="t-desc">API GW → Lambda → DynamoDB</div></div>
-      <div class="template-card" onclick="loadWorkflow('image')"><div style="font-size:1.5rem">🖼️</div><div class="t-name">Image Processing</div><div class="t-desc">S3 → Lambda → Rekognition → S3</div></div>
-      <div class="template-card" onclick="loadWorkflow('stream')"><div style="font-size:1.5rem">📊</div><div class="t-name">Data Streaming</div><div class="t-desc">Kinesis → Lambda → Firehose → S3</div></div>
-      <div class="template-card" onclick="loadWorkflow('batch')"><div style="font-size:1.5rem">⏰</div><div class="t-name">Scheduled Batch</div><div class="t-desc">EventBridge → Lambda → SQS → Lambda</div></div>
-      <div class="template-card" onclick="loadWorkflow('webhook')"><div style="font-size:1.5rem">🔔</div><div class="t-name">Webhook Processor</div><div class="t-desc">API GW → SQS → Lambda → SNS</div></div>
+      <div class="template-card" onclick="loadWorkflow('api')"><div style="font-size:1rem;color:var(--accent);font-weight:700">API</div><div class="t-name">REST API</div><div class="t-desc">API GW → Lambda → DynamoDB</div></div>
+      <div class="template-card" onclick="loadWorkflow('image')"><div style="font-size:1rem;color:var(--accent);font-weight:700">IMG</div><div class="t-name">Image Processing</div><div class="t-desc">S3 → Lambda → Rekognition → S3</div></div>
+      <div class="template-card" onclick="loadWorkflow('stream')"><div style="font-size:1rem;color:var(--accent);font-weight:700">STR</div><div class="t-name">Data Streaming</div><div class="t-desc">Kinesis → Lambda → Firehose → S3</div></div>
+      <div class="template-card" onclick="loadWorkflow('batch')"><div style="font-size:1rem;color:var(--accent);font-weight:700">SCH</div><div class="t-name">Scheduled Batch</div><div class="t-desc">EventBridge → Lambda → SQS → Lambda</div></div>
+      <div class="template-card" onclick="loadWorkflow('webhook')"><div style="font-size:1rem;color:var(--accent);font-weight:700">WHK</div><div class="t-name">Webhook Processor</div><div class="t-desc">API GW → SQS → Lambda → SNS</div></div>
     </div>
   </div>
   <div class="card" style="margin-bottom:20px">
@@ -146,36 +146,36 @@ let activeSlots=0;
 
 const WORKFLOWS={
   api:[
-    {name:'API Gateway',type:'Trigger',icon:'🌐',service:'apigw',duration:[5,15]},
-    {name:'Auth Lambda',type:'Lambda',icon:'🔐',service:'lambda',duration:[20,80],coldStart:[150,400]},
-    {name:'Business Logic',type:'Lambda',icon:'⚡',service:'lambda',duration:[50,200],coldStart:[200,500]},
-    {name:'DynamoDB',type:'Database',icon:'💾',service:'dynamodb',duration:[5,20]}
+    {name:'API Gateway',type:'Trigger',icon:'GW',service:'apigw',duration:[5,15]},
+    {name:'Auth Lambda',type:'Lambda',icon:'FN',service:'lambda',duration:[20,80],coldStart:[150,400]},
+    {name:'Business Logic',type:'Lambda',icon:'FN',service:'lambda',duration:[50,200],coldStart:[200,500]},
+    {name:'DynamoDB',type:'Database',icon:'DB',service:'dynamodb',duration:[5,20]}
   ],
   image:[
-    {name:'S3 Upload',type:'Trigger',icon:'📤',service:'s3',duration:[10,30]},
-    {name:'Resize Lambda',type:'Lambda',icon:'🖼️',service:'lambda',duration:[200,800],coldStart:[300,600]},
-    {name:'Rekognition',type:'AI Service',icon:'🤖',service:'rekognition',duration:[500,2000]},
-    {name:'Metadata Lambda',type:'Lambda',icon:'📝',service:'lambda',duration:[30,100],coldStart:[150,350]},
-    {name:'S3 Output',type:'Storage',icon:'💾',service:'s3',duration:[10,40]}
+    {name:'S3 Upload',type:'Trigger',icon:'S3',service:'s3',duration:[10,30]},
+    {name:'Resize Lambda',type:'Lambda',icon:'FN',service:'lambda',duration:[200,800],coldStart:[300,600]},
+    {name:'Rekognition',type:'AI Service',icon:'AI',service:'rekognition',duration:[500,2000]},
+    {name:'Metadata Lambda',type:'Lambda',icon:'FN',service:'lambda',duration:[30,100],coldStart:[150,350]},
+    {name:'S3 Output',type:'Storage',icon:'S3',service:'s3',duration:[10,40]}
   ],
   stream:[
-    {name:'Kinesis Stream',type:'Trigger',icon:'📊',service:'kinesis',duration:[10,50]},
-    {name:'Transform Lambda',type:'Lambda',icon:'⚡',service:'lambda',duration:[30,150],coldStart:[180,450]},
-    {name:'Firehose',type:'Delivery',icon:'🔥',service:'firehose',duration:[100,500]},
-    {name:'S3 Data Lake',type:'Storage',icon:'💾',service:'s3',duration:[10,30]}
+    {name:'Kinesis Stream',type:'Trigger',icon:'KS',service:'kinesis',duration:[10,50]},
+    {name:'Transform Lambda',type:'Lambda',icon:'FN',service:'lambda',duration:[30,150],coldStart:[180,450]},
+    {name:'Firehose',type:'Delivery',icon:'FH',service:'firehose',duration:[100,500]},
+    {name:'S3 Data Lake',type:'Storage',icon:'S3',service:'s3',duration:[10,30]}
   ],
   batch:[
-    {name:'EventBridge',type:'Trigger',icon:'⏰',service:'eventbridge',duration:[5,10]},
-    {name:'Orchestrator',type:'Lambda',icon:'🎯',service:'lambda',duration:[20,60],coldStart:[150,350]},
-    {name:'SQS Queue',type:'Queue',icon:'📬',service:'sqs',duration:[5,15]},
-    {name:'Worker Lambda',type:'Lambda',icon:'⚡',service:'lambda',duration:[100,500],coldStart:[200,500]},
-    {name:'SNS Notify',type:'Notification',icon:'🔔',service:'sns',duration:[5,20]}
+    {name:'EventBridge',type:'Trigger',icon:'EB',service:'eventbridge',duration:[5,10]},
+    {name:'Orchestrator',type:'Lambda',icon:'FN',service:'lambda',duration:[20,60],coldStart:[150,350]},
+    {name:'SQS Queue',type:'Queue',icon:'SQ',service:'sqs',duration:[5,15]},
+    {name:'Worker Lambda',type:'Lambda',icon:'FN',service:'lambda',duration:[100,500],coldStart:[200,500]},
+    {name:'SNS Notify',type:'Notification',icon:'SN',service:'sns',duration:[5,20]}
   ],
   webhook:[
-    {name:'API Gateway',type:'Trigger',icon:'🌐',service:'apigw',duration:[5,15]},
-    {name:'SQS Buffer',type:'Queue',icon:'📬',service:'sqs',duration:[5,15]},
-    {name:'Processor',type:'Lambda',icon:'⚡',service:'lambda',duration:[50,300],coldStart:[200,500]},
-    {name:'SNS Fan-out',type:'Notification',icon:'🔔',service:'sns',duration:[5,20]}
+    {name:'API Gateway',type:'Trigger',icon:'GW',service:'apigw',duration:[5,15]},
+    {name:'SQS Buffer',type:'Queue',icon:'SQ',service:'sqs',duration:[5,15]},
+    {name:'Processor',type:'Lambda',icon:'FN',service:'lambda',duration:[50,300],coldStart:[200,500]},
+    {name:'SNS Fan-out',type:'Notification',icon:'SN',service:'sns',duration:[5,20]}
   ]
 };
 
@@ -231,7 +231,7 @@ async function runSimulation(){
       // Memory affects duration
       dur=Math.round(dur*(1024/memory));
       totalDuration+=dur;
-      document.getElementById('timing-'+i).textContent=dur+'ms'+(isCold&&node.coldStart?' ❄️':'');
+      document.getElementById('timing-'+i).textContent=dur+'ms'+(isCold&&node.coldStart?' [cold]':'');
 
       await sleep(delay);
 
