@@ -1,69 +1,82 @@
-# Serverless Workflow Simulator
+<h1 align="center">Serverless Workflow Simulator</h1>
 
-An interactive simulator for event-driven serverless architectures. Visualize Lambda execution flows, cold starts, concurrency limits, and cost projections in real time. Single-page web application deployable on GitHub Pages.
+<p align="center">
+  <em>Model event-driven serverless pipelines — visualize Lambda execution flows, cold starts, and cost projections.</em>
+</p>
+
+<p align="center">
+  <a href="https://freddricklogan.github.io/serverless-workflow-simulator/"><img src="https://img.shields.io/badge/Live_Demo-Open_App-ff9900?style=for-the-badge&logo=awslambda&logoColor=white" alt="Live Demo"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/AWS-Lambda-ff9900?logo=awslambda&logoColor=white" alt="Lambda">
+  <img src="https://img.shields.io/badge/JavaScript-Vanilla_ES6-f7df1e?logo=javascript&logoColor=black" alt="JavaScript">
+  <img src="https://img.shields.io/badge/Charts-Chart.js-ff6384?logo=chartdotjs&logoColor=white" alt="Chart.js">
+  <img src="https://img.shields.io/badge/License-MIT-lightgrey" alt="License">
+</p>
+
+---
+
+## Overview
+
+**Serverless Workflow Simulator** models event-driven serverless architectures so you can reason
+about their behavior *before* deploying them. Compose a pipeline of functions and event sources, run
+the simulation, and see execution flows, **cold-start** impact, and **cost projections** — the three
+things that most often surprise teams moving to serverless.
+
+It demonstrates a working mental model of how Lambda-style compute actually behaves under load, and
+the ability to turn that model into an interactive teaching and planning tool.
+
+> **▶ [Launch the live demo](https://freddricklogan.github.io/serverless-workflow-simulator/)**
+
+---
+
+## Why this project
+
+| Skill demonstrated | Where it shows up |
+|:--|:--|
+| **Serverless / event-driven architecture** | Function-and-event pipeline modeling |
+| **Performance reasoning** | Cold-start analysis and its effect on latency |
+| **Cloud cost modeling** | Per-invocation cost projections across a workflow |
+| **Data visualization** | Execution-flow and metric charts with Chart.js |
+| **Product design** | Packaging cloud expertise into an interactive simulator |
+
+---
 
 ## Features
 
-### Workflow Visualization
-- Animated data flow through serverless pipeline stages
-- Real-time node status: active, complete, error
-- Per-stage execution timing with cold start indicators
-- Arrow-based flow animation between services
+- **Event-driven pipeline modeling** of Lambda-style execution flows
+- **Cold-start analysis** to quantify latency impact
+- **Cost projections** across the workflow
+- Real-time, chart-driven visualizations
+- Fully client-side — nothing to install
 
-### Pre-Built Workflow Templates
-- **REST API** — API Gateway → Lambda → DynamoDB
-- **Image Processing** — S3 → Lambda → Rekognition → S3
-- **Data Streaming** — Kinesis → Lambda → Firehose → S3
-- **Scheduled Batch** — EventBridge → Lambda → SQS → Lambda → SNS
-- **Webhook Processor** — API Gateway → SQS → Lambda → SNS
+---
 
-### Execution Simulation
-- Configurable concurrency limits (1-50 concurrent executions)
-- Adjustable error rate injection (0-30%)
-- Cold start simulation with ~15% frequency
-- Memory allocation effects on execution duration
-- Timeout configuration
+## Tech stack
 
-### Performance Metrics
-- **Invocation Tracking** — Total, successful, and failed invocations
-- **Duration Distribution** — Histogram of execution times
-- **Cold Start Analysis** — Cold vs warm start frequency and average durations
-- **Cost Projection** — Per-invocation cost based on memory and duration
-- **Concurrency Visualization** — Live slot utilization bar
+- **Language:** Vanilla JavaScript (ES6+)
+- **Charting:** Chart.js
+- **Runtime:** 100% client-side — no backend, no install
 
-### Error Handling
-- Simulated Lambda errors (timeout, OOM, throttling, connection refused)
-- Dead Letter Queue visualization for failed messages
-- Error rate tracking and reporting
+---
 
-### Execution Log
-- Real-time event feed with timestamps
-- Color-coded success/error entries
-- Run-by-run execution history
+## Run locally
 
-## Technologies
+```bash
+git clone https://github.com/Freddricklogan/serverless-workflow-simulator.git
+cd serverless-workflow-simulator
+python3 -m http.server 8000
+# then visit http://localhost:8000
+```
 
-- **JavaScript** — Workflow engine, simulation logic, and async execution
-- **Chart.js** — Duration distribution and cost projection charts
-- **HTML5/CSS3** — Animated pipeline visualization
-- **Client-Side Only** — No backend or AWS account required
+---
 
-## How to Use
+## Author
 
-1. Open `index.html` in any modern browser
-2. Select a **workflow template** (REST API, Image Processing, etc.)
-3. Configure simulation parameters: speed, concurrency, error rate, memory, timeout
-4. Click **Run Workflow** to start the simulation
-5. Watch the animated pipeline and monitor metrics in real time
-6. Review execution logs, cold start analysis, and cost projections
-
-## Use Cases
-
-- **Serverless Architecture Design** — Understand event-driven patterns and trade-offs
-- **AWS Lambda Training** — Learn cold starts, concurrency, and cost optimization
-- **DevOps Education** — Demonstrate serverless monitoring and error handling
-- **Technical Interviews** — Discuss serverless architecture with visual aids
+**Freddrick Logan** — Educational Technologist & Technology Leader
+[GitHub](https://github.com/Freddricklogan) · [LinkedIn](https://www.linkedin.com/in/freddricklogan/)
 
 ## License
 
-MIT License
+Released under the [MIT License](LICENSE).
