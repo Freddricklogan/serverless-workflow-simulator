@@ -1,0 +1,69 @@
+{
+  "source": "AWS Price List Bulk API, us-east-1, on-demand, first pricing tier",
+  "fetched": "2026-09-21",
+  "published": {
+    "lambda": "2026-09-19T00:23:59Z",
+    "stepFunctions": "2026-09-11T12:45:11Z",
+    "sqs": "2026-09-11T12:46:07Z",
+    "sns": "2026-09-15T15:19:44Z",
+    "apiGateway": "2026-09-11T12:44:08Z",
+    "dynamodb": "2026-09-11T12:44:22Z"
+  },
+  "rates": {
+    "lambdaRequest": {
+      "usd": 2e-7,
+      "per": "request",
+      "note": "AWS Lambda - Total Requests - US East (Northern Virginia)"
+    },
+    "lambdaGbSecond": {
+      "usd": 0.0000166667,
+      "per": "GB-second (x86, first tier)",
+      "note": "AWS Lambda - Total Compute - US East (Northern Virginia)-Tier-1"
+    },
+    "stateTransition": {
+      "usd": 0.000025,
+      "per": "state transition (Standard workflows)",
+      "note": "$0.000025 per state transition"
+    },
+    "expressRequest": {
+      "usd": 0.000001,
+      "per": "request (Express workflows)",
+      "note": "Express Workflows - Total Requests"
+    },
+    "expressGbSecond": {
+      "usd": 0.00001667,
+      "per": "GB-second (Express, first tier)",
+      "note": "Express Workflows - Duration - USD 0.00001667 per GB-S for the first 3.6 million GB-Seconds"
+    },
+    "sqsRequest": {
+      "usd": 4e-7,
+      "per": "standard queue request (first tier)",
+      "note": "$0.40 per million Amazon SQS standard requests in Tier1 in US East (N Virginia)"
+    },
+    "snsRequest": {
+      "usd": 5e-7,
+      "per": "API request beyond the free 1M/month",
+      "note": "$0.50 per 1,000,000 Amazon SNS API Requests per month thereafter"
+    },
+    "apiGatewayRestRequest": {
+      "usd": 0.0000035,
+      "per": "REST API request (first tier)",
+      "note": "$3.50/million requests - first 333 million requests/month"
+    },
+    "apiGatewayHttpRequest": {
+      "usd": 0.000001,
+      "per": "HTTP API request (first tier)",
+      "note": "$1/million requests - API Gateway HTTP API (first 300 million)"
+    },
+    "dynamoWriteUnit": {
+      "usd": 6.25e-7,
+      "per": "on-demand write request unit",
+      "note": "$0.625 per million write request units (N. Virginia)"
+    },
+    "dynamoReadUnit": {
+      "usd": 1.25e-7,
+      "per": "on-demand read request unit",
+      "note": "$0.125 per million read request units (N. Virginia)"
+    }
+  }
+}
