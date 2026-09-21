@@ -1,0 +1,82 @@
+{
+  "note": "Five teaching workflows written in Amazon States Language. Resource ARNs use the optimized Step Functions integrations; account ids are placeholders.",
+  "workflows": {
+    "api": {
+      "label": "API request with retry",
+      "input": { "userId": "u-42", "tier": "gold" },
+      "definition": {
+        "Comment": "API Gateway → authorise → business logic → DynamoDB, with retry on the Lambda calls.",
+        "StartAt": "Authorise",
+        "States": {
+          "Authorise": { "Type": "Task", "Resource": "arn:aws:states:::lambda:invoke", "Parameters": { "FunctionName": "auth" }, "Retry": [{ "ErrorEquals": ["Lambda.ServiceException"], "IntervalSeconds": 1, "MaxAttempts": 2, "BackoffRate": 2 }], "Next": "Tier?" },
+          "Tier?": { "Type": "Choice", "Choices": [{ "Variable": "$.tier", "StringEquals": "gold", "Next": "PriorityLogic" }], "Default": "StandardLogic" },
+          "PriorityLogic": { "Type": "Task", "Resource": "arn:aws:states:::lambda:invoke", "Parameters": { "FunctionName": "logic-priority" }, "Retry": [{ "ErrorEquals": ["States.TaskFailed"], "MaxAttempts": 2 }], "Catch": [{ "ErrorEquals": ["States.ALL"], "Next": "RecordFailure" }], "Next": "Persist" },
+          "StandardLogic": { "Type": "Task", "Resource": "arn:aws:states:::lambda:invoke", "Parameters": { "FunctionName": "logic" }, "Retry": [{ "ErrorEquals": ["States.TaskFailed"], "MaxAttempts": 2 }], "Catch": [{ "ErrorEquals": ["States.ALL"], "Next": "RecordFailure" }], "Next": "Persist" },
+          "Persist": { "Type": "Task", "Resource": "arn:aws:states:::dynamodb:putItem", "Parameters": { "TableName": "requests" }, "End": true },
+          "RecordFailure": { "Type": "Task", "Resource": "arn:aws:states:::sqs:sendMessage", "Parameters": { "QueueUrl": "dlq" }, "Next": "Failed" },
+          "Failed": { "Type": "Fail", "Error": "BusinessLogicFailed", "Cause": "Sent to the dead-letter queue" }
+        }
+      }
+    },
+    "image": {
+      "label": "Image pipeline (parallel)",
+      "input": { "key": "uploads/photo.jpg" },
+      "definition": {
+        "Comment": "S3 event → resize and label in parallel → write metadata.",
+        "StartAt": "Process",
+        "States": {
+          "Process": { "Type": "Parallel", "Branches": [
+            { "StartAt": "Resize", "States": { "Resize": { "Type": "Task", "Resource": "arn:aws:states:::lambda:invoke", "Parameters": { "FunctionName": "resize" }, "Retry": [{ "ErrorEquals": ["States.ALL"], "MaxAttempts": 1 }], "End": true } } },
+            { "StartAt": "Label", "States": { "Label": { "Type": "Task", "Resource": "arn:aws:states:::aws-sdk:rekognition:detectLabels", "End": true } } }
+          ], "Next": "Metadata" },
+          "Metadata": { "Type": "Task", "Resource": "arn:aws:states:::dynamodb:putItem", "Parameters": { "TableName": "images" }, "Next": "Notify" },
+          "Notify": { "Type": "Task", "Resource": "arn:aws:states:::sns:publish", "Parameters": { "TopicArn": "image-ready" }, "End": true }
+        }
+      }
+    },
+    "batch": {
+      "label": "Nightly batch (Map)",
+      "input": { "records": ["r1", "r2", "r3", "r4", "r5", "r6"] },
+      "definition": {
+        "Comment": "EventBridge schedule → map over records with bounded concurrency → summary.",
+        "StartAt": "Fetch",
+        "States": {
+          "Fetch": { "Type": "Task", "Resource": "arn:aws:states:::lambda:invoke", "Parameters": { "FunctionName": "fetch-batch" }, "ResultPath": null, "Next": "EachRecord" },
+          "EachRecord": { "Type": "Map", "ItemsPath": "$.records", "MaxConcurrency": 2, "ItemProcessor": { "StartAt": "Work", "States": { "Work": { "Type": "Task", "Resource": "arn:aws:states:::lambda:invoke", "Parameters": { "FunctionName": "worker" }, "Retry": [{ "ErrorEquals": ["Lambda.ServiceException"], "MaxAttempts": 3, "IntervalSeconds": 1, "BackoffRate": 2 }], "End": true } } }, "Next": "Summarise" },
+          "Summarise": { "Type": "Task", "Resource": "arn:aws:states:::sns:publish", "Parameters": { "TopicArn": "batch-done" }, "End": true }
+        }
+      }
+    },
+    "approval": {
+      "label": "Approval with wait and timeout",
+      "input": { "amount": 12000, "requester": "grants" },
+      "definition": {
+        "Comment": "Purchase request: small amounts auto-approve; large ones wait for a human.",
+        "StartAt": "Amount?",
+        "States": {
+          "Amount?": { "Type": "Choice", "Choices": [{ "Variable": "$.amount", "NumericGreaterThan": 10000, "Next": "RequestApproval" }], "Default": "AutoApprove" },
+          "AutoApprove": { "Type": "Pass", "Result": { "approved": true, "by": "policy" }, "Next": "Record" },
+          "RequestApproval": { "Type": "Task", "Resource": "arn:aws:states:::sns:publish", "Parameters": { "TopicArn": "approvers" }, "Next": "WaitForDecision" },
+          "WaitForDecision": { "Type": "Wait", "Seconds": 30, "Next": "Decide" },
+          "Decide": { "Type": "Task", "Resource": "arn:aws:states:::lambda:invoke", "Parameters": { "FunctionName": "check-decision" }, "Catch": [{ "ErrorEquals": ["States.ALL"], "Next": "Rejected" }], "Next": "Record" },
+          "Record": { "Type": "Task", "Resource": "arn:aws:states:::dynamodb:putItem", "Parameters": { "TableName": "purchases" }, "Next": "Done" },
+          "Done": { "Type": "Succeed" },
+          "Rejected": { "Type": "Fail", "Error": "NotApproved" }
+        }
+      }
+    },
+    "webhook": {
+      "label": "Webhook buffer (Express)",
+      "input": { "event": "payment.completed" },
+      "definition": {
+        "Comment": "API Gateway → SQS buffer → processor → fan-out. Suited to an Express workflow.",
+        "StartAt": "Buffer",
+        "States": {
+          "Buffer": { "Type": "Task", "Resource": "arn:aws:states:::sqs:sendMessage", "Parameters": { "QueueUrl": "webhooks" }, "Next": "Process" },
+          "Process": { "Type": "Task", "Resource": "arn:aws:states:::lambda:invoke", "Parameters": { "FunctionName": "processor" }, "Retry": [{ "ErrorEquals": ["States.ALL"], "MaxAttempts": 2, "IntervalSeconds": 1 }], "Next": "FanOut" },
+          "FanOut": { "Type": "Task", "Resource": "arn:aws:states:::sns:publish", "Parameters": { "TopicArn": "payments" }, "End": true }
+        }
+      }
+    }
+  }
+}
