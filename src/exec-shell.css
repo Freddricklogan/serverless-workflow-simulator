@@ -1,21 +1,293 @@
 /* ==========================================================================
    Executive Shell — portfolio standard v1 (static demo chrome)
    Header + badge row + KPI strip + guided tour overlay + footer.
-   Dark theme only, WCAG AA contrast, reduced-motion aware, no horizontal
-   scroll at 320px. Zero dependencies.
+   Six category palettes selected by data-theme on <html> (default: midnight),
+   each with a light variant under prefers-color-scheme: light. Only colour
+   changes between palettes — type, spacing and structure are fixed.
+   Every token pair is checked for WCAG AA by contrast-check (mjs/py).
+   Zero dependencies.
    ========================================================================== */
 
-:root {
+/* --- palettes ------------------------------------------------------------- */
+/* --primary / --secondary are the palette's two hues; --accent / --accent-2 are
+   what components use. data-accent="secondary" on <html> swaps them. */
+:root,
+[data-theme="midnight"] {
   --bg: #0b1220;
   --panel: #111a2e;
   --panel-2: #16223a;
   --border: #22304d;
   --text: #e6edf3;
   --muted: #8b98b0;
-  --accent: #58a6ff;
+  --primary: #d4a95a;
+  --secondary: #58a6ff;
   --ok: #3fb950;
   --warn: #d29922;
   --danger: #f85149;
+  --on-accent: #0b1220;
+  --chart-1: #d4a95a;
+  --chart-2: #58a6ff;
+  --chart-3: #3fb950;
+  --chart-4: #f85149;
+  --chart-5: #d2a8ff;
+  --chart-6: #ffa657;
+  --chart-7: #79c0ff;
+  --chart-8: #f2cc60;
+}
+[data-theme="signal"] {
+  --bg: #0f172a;
+  --panel: #16213b;
+  --panel-2: #1c2a4a;
+  --border: #2a3a5f;
+  --text: #e5e9f2;
+  --muted: #94a3b8;
+  --primary: #818cf8;
+  --secondary: #2dd4bf;
+  --ok: #34d399;
+  --warn: #fbbf24;
+  --danger: #fb7185;
+  --on-accent: #0f172a;
+  --chart-1: #818cf8;
+  --chart-2: #2dd4bf;
+  --chart-3: #f472b6;
+  --chart-4: #fbbf24;
+  --chart-5: #60a5fa;
+  --chart-6: #a3e635;
+  --chart-7: #fb923c;
+  --chart-8: #c4b5fd;
+}
+[data-theme="graphite"] {
+  --bg: #0b0f14;
+  --panel: #131a22;
+  --panel-2: #1a232e;
+  --border: #2a3542;
+  --text: #e6e9ee;
+  --muted: #98a2b3;
+  --primary: #f59e0b;
+  --secondary: #a3e635;
+  --ok: #a3e635;
+  --warn: #f59e0b;
+  --danger: #f87171;
+  --on-accent: #0b0f14;
+  --chart-1: #f59e0b;
+  --chart-2: #a3e635;
+  --chart-3: #f87171;
+  --chart-4: #38bdf8;
+  --chart-5: #c084fc;
+  --chart-6: #fb923c;
+  --chart-7: #34d399;
+  --chart-8: #f9a8d4;
+}
+[data-theme="ember"] {
+  --bg: #1a1614;
+  --panel: #231e1b;
+  --panel-2: #2c2622;
+  --border: #3d352f;
+  --text: #f1ebe4;
+  --muted: #b0a397;
+  --primary: #e0b356;
+  --secondary: #f4845f;
+  --ok: #7cc47f;
+  --warn: #e0b356;
+  --danger: #f26b6b;
+  --on-accent: #1a1614;
+  --chart-1: #e0b356;
+  --chart-2: #f4845f;
+  --chart-3: #7cc47f;
+  --chart-4: #6bb1e0;
+  --chart-5: #c9a2e6;
+  --chart-6: #f2d16b;
+  --chart-7: #f9a8d4;
+  --chart-8: #9be7ff;
+}
+[data-theme="plum"] {
+  --bg: #1a1024;
+  --panel: #241733;
+  --panel-2: #2e1f42;
+  --border: #433059;
+  --text: #f0e9f7;
+  --muted: #b3a3c7;
+  --primary: #c084fc;
+  --secondary: #6ee7b7;
+  --ok: #6ee7b7;
+  --warn: #fbbf24;
+  --danger: #fb7185;
+  --on-accent: #1a1024;
+  --chart-1: #c084fc;
+  --chart-2: #6ee7b7;
+  --chart-3: #f9a8d4;
+  --chart-4: #fbbf24;
+  --chart-5: #7dd3fc;
+  --chart-6: #fda4af;
+  --chart-7: #fde68a;
+  --chart-8: #86efac;
+}
+[data-theme="forest"] {
+  --bg: #0d1b16;
+  --panel: #14261f;
+  --panel-2: #1b3128;
+  --border: #2c463b;
+  --text: #e7f0ea;
+  --muted: #9fb3a7;
+  --primary: #a3e635;
+  --secondary: #7dd3fc;
+  --ok: #4ade80;
+  --warn: #facc15;
+  --danger: #f87171;
+  --on-accent: #0d1b16;
+  --chart-1: #a3e635;
+  --chart-2: #7dd3fc;
+  --chart-3: #f472b6;
+  --chart-4: #facc15;
+  --chart-5: #fb923c;
+  --chart-6: #c4b5fd;
+  --chart-7: #fde68a;
+  --chart-8: #f9a8d4;
+}
+@media (prefers-color-scheme: light) {  :root,
+  [data-theme="midnight"] {
+    --bg: #f6f8fb;
+    --panel: #ffffff;
+    --panel-2: #eaf0f8;
+    --border: #c9d4e3;
+    --text: #0b1220;
+    --muted: #4a5568;
+    --primary: #7a5a20;
+    --secondary: #1d4ed8;
+    --ok: #15803d;
+    --warn: #92400e;
+    --danger: #b91c1c;
+    --on-accent: #ffffff;
+    --chart-1: #7a5a20;
+    --chart-2: #1d4ed8;
+    --chart-3: #15803d;
+    --chart-4: #b91c1c;
+    --chart-5: #6d28d9;
+    --chart-6: #c2410c;
+    --chart-7: #0e7490;
+    --chart-8: #a16207;
+  }
+  [data-theme="signal"] {
+    --bg: #f8fafc;
+    --panel: #ffffff;
+    --panel-2: #eef2ff;
+    --border: #cbd5e1;
+    --text: #0f172a;
+    --muted: #475569;
+    --primary: #4f46e5;
+    --secondary: #0f766e;
+    --ok: #15803d;
+    --warn: #b45309;
+    --danger: #be123c;
+    --on-accent: #ffffff;
+    --chart-1: #4f46e5;
+    --chart-2: #0f766e;
+    --chart-3: #be185d;
+    --chart-4: #b45309;
+    --chart-5: #1d4ed8;
+    --chart-6: #4d7c0f;
+    --chart-7: #c2410c;
+    --chart-8: #6d28d9;
+  }
+  [data-theme="graphite"] {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --panel-2: #eef1f5;
+    --border: #cfd6df;
+    --text: #0b0f14;
+    --muted: #4b5563;
+    --primary: #9a4507;
+    --secondary: #3f6212;
+    --ok: #3f6212;
+    --warn: #9a4507;
+    --danger: #b91c1c;
+    --on-accent: #ffffff;
+    --chart-1: #9a4507;
+    --chart-2: #3f6212;
+    --chart-3: #b91c1c;
+    --chart-4: #0369a1;
+    --chart-5: #7e22ce;
+    --chart-6: #c2410c;
+    --chart-7: #047857;
+    --chart-8: #9d174d;
+  }
+  [data-theme="ember"] {
+    --bg: #faf6f1;
+    --panel: #ffffff;
+    --panel-2: #f3ece3;
+    --border: #d9cfc3;
+    --text: #1a1614;
+    --muted: #5b514a;
+    --primary: #8b5e00;
+    --secondary: #b3401d;
+    --ok: #2f6f3a;
+    --warn: #8b5e00;
+    --danger: #b3261e;
+    --on-accent: #ffffff;
+    --chart-1: #8b5e00;
+    --chart-2: #b3401d;
+    --chart-3: #2f6f3a;
+    --chart-4: #1f5f8b;
+    --chart-5: #6b3fa0;
+    --chart-6: #7a6400;
+    --chart-7: #9d174d;
+    --chart-8: #0e7490;
+  }
+  [data-theme="plum"] {
+    --bg: #faf7fd;
+    --panel: #ffffff;
+    --panel-2: #f1eafa;
+    --border: #d6c9e6;
+    --text: #1a1024;
+    --muted: #5b4b6e;
+    --primary: #7e22ce;
+    --secondary: #047857;
+    --ok: #047857;
+    --warn: #b45309;
+    --danger: #be123c;
+    --on-accent: #ffffff;
+    --chart-1: #7e22ce;
+    --chart-2: #047857;
+    --chart-3: #be185d;
+    --chart-4: #b45309;
+    --chart-5: #0369a1;
+    --chart-6: #9f1239;
+    --chart-7: #a16207;
+    --chart-8: #15803d;
+  }
+  [data-theme="forest"] {
+    --bg: #f5faf7;
+    --panel: #ffffff;
+    --panel-2: #e9f3ed;
+    --border: #c9dccf;
+    --text: #0d1b16;
+    --muted: #4a5d53;
+    --primary: #3f6212;
+    --secondary: #0369a1;
+    --ok: #15803d;
+    --warn: #a16207;
+    --danger: #b91c1c;
+    --on-accent: #ffffff;
+    --chart-1: #3f6212;
+    --chart-2: #0369a1;
+    --chart-3: #be185d;
+    --chart-4: #a16207;
+    --chart-5: #c2410c;
+    --chart-6: #6d28d9;
+    --chart-7: #a16207;
+    --chart-8: #9d174d;
+  }
+}
+/* --- derived tokens (never edit per repo) --------------------------------- */
+:root {
+  --accent: var(--primary);
+  --accent-2: var(--secondary);
+  --accent-hover: color-mix(in srgb, var(--accent) 82%, var(--text));
+  --accent-glow: color-mix(in srgb, var(--accent) 45%, transparent);
+  --header-fade: color-mix(in srgb, var(--panel) 94%, transparent);
+  --backdrop: color-mix(in srgb, var(--bg) 72%, transparent);
+  --btn-hover: color-mix(in srgb, var(--panel-2) 80%, var(--accent));
+  --shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
 
   --radius: 10px;
   --radius-sm: 6px;
@@ -28,6 +300,17 @@
   --shell-z-tour: 9000;
 }
 
+[data-accent="secondary"] {
+  --accent: var(--secondary);
+  --accent-2: var(--primary);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
+  }
+}
+
 /* --- base ---------------------------------------------------------------- */
 
 *,
@@ -38,6 +321,12 @@
 
 html {
   color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  html {
+    color-scheme: light;
+  }
 }
 
 body {
@@ -81,7 +370,7 @@ a {
   z-index: calc(var(--shell-z-tour) + 10);
   padding: 10px 16px;
   background: var(--accent);
-  color: #06101f;
+  color: var(--on-accent);
   font-weight: 700;
   border-radius: var(--radius-sm);
   text-decoration: none;
@@ -98,7 +387,7 @@ a {
   position: sticky;
   top: 0;
   z-index: 500;
-  background: linear-gradient(180deg, var(--panel) 0%, rgba(17, 26, 46, 0.94) 100%);
+  background: linear-gradient(180deg, var(--panel) 0%, var(--header-fade) 100%);
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(8px);
 }
@@ -167,7 +456,7 @@ a {
 
 .exec-badges__item--accent {
   color: var(--accent);
-  border-color: rgba(88, 166, 255, 0.45);
+  border-color: var(--accent-glow);
 }
 
 .exec-header__actions {
@@ -198,19 +487,19 @@ a {
 }
 
 .exec-btn:hover {
-  background: #1d2b48;
+  background: var(--btn-hover);
   border-color: var(--accent);
 }
 
 .exec-btn--primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #06101f;
+  color: var(--on-accent);
 }
 
 .exec-btn--primary:hover {
-  background: #7bb8ff;
-  border-color: #7bb8ff;
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 /* --- KPI strip ----------------------------------------------------------- */
@@ -276,7 +565,7 @@ a {
   position: fixed;
   inset: 0;
   z-index: var(--shell-z-tour);
-  background: rgba(3, 7, 15, 0.72);
+  background: var(--backdrop);
 }
 
 .exec-tour-backdrop[hidden] {
@@ -287,7 +576,7 @@ a {
   position: absolute;
   border: 2px solid var(--accent);
   border-radius: var(--radius);
-  box-shadow: 0 0 0 9999px rgba(3, 7, 15, 0.72), 0 0 22px rgba(88, 166, 255, 0.45);
+  box-shadow: 0 0 0 9999px var(--backdrop), 0 0 22px var(--accent-glow);
   pointer-events: none;
   transition: all var(--shell-speed) ease;
 }
@@ -299,7 +588,7 @@ a {
   border: 1px solid var(--accent);
   border-radius: var(--radius);
   padding: 18px;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+  box-shadow: var(--shadow);
 }
 
 .exec-tour-card__step {

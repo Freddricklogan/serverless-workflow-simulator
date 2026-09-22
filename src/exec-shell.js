@@ -56,7 +56,51 @@ function prefersReducedMotion() {
  * @typedef {{ label: string, compute: () => (string|number), tone?: 'ok'|'warn'|'danger'|'accent' }} KpiSpec
  * @typedef {{ selector: string, title: string, body: string, action?: () => void|Promise<void> }} TourStep
  * @typedef {{ label: string, tone?: 'accent'|'plain', dot?: boolean }} BadgeSpec
+ * @typedef {'signal'|'graphite'|'ember'|'plum'|'forest'|'midnight'} ThemeName
  */
+
+export const THEMES = ['signal', 'graphite', 'ember', 'plum', 'forest', 'midnight'];
+/** Outside a browser (unit tests) tokens() returns the midnight dark palette so logic modules stay testable. */
+const NODE_TOKENS = { bg: '#0b1220', panel: '#111a2e', panel2: '#16223a', border: '#22304d', text: '#e6edf3', muted: '#8b98b0', accent: '#d4a95a', accent2: '#58a6ff', ok: '#3fb950', warn: '#d29922', danger: '#f85149', onAccent: '#0b1220', series: ['#d4a95a', '#58a6ff', '#3fb950', '#f85149', '#d2a8ff', '#ffa657', '#79c0ff', '#f2cc60'] };
+const TOKEN_NAMES = ['bg', 'panel', 'panel-2', 'border', 'text', 'muted', 'accent', 'accent-2', 'ok', 'warn', 'danger', 'on-accent'];
+
+/**
+ * Apply a category palette. Sets data-theme (and data-accent="secondary" to swap the two hues) on
+ * <html>; the palettes themselves live in exec-shell.css. Repos never write colour values.
+ * @param {ThemeName} theme
+ * @param {'primary'|'secondary'} [accent]
+ */
+export function applyTheme(theme, accent = 'primary') {
+  if (!THEMES.includes(theme)) throw new Error(`applyTheme: unknown theme "${theme}" (expected one of ${THEMES.join(', ')})`);
+  document.documentElement.dataset.theme = theme;
+  if (accent === 'secondary') document.documentElement.dataset.accent = 'secondary';
+  else delete document.documentElement.dataset.accent;
+}
+
+/**
+ * The palette as resolved right now (dark or light, after any data-accent swap) so chart
+ * libraries draw with the page's colours. `series` is --chart-1 … --chart-8.
+ * @returns {{ bg: string, panel: string, panel2: string, border: string, text: string, muted: string,
+ *   accent: string, accent2: string, ok: string, warn: string, danger: string, onAccent: string, series: string[] }}
+ */
+export function tokens() {
+  if (typeof document === 'undefined') return { ...NODE_TOKENS, series: [...NODE_TOKENS.series] };
+  const cs = getComputedStyle(document.documentElement);
+  const read = (name) => cs.getPropertyValue(`--${name}`).trim();
+  const out = {};
+  for (const n of TOKEN_NAMES) out[n.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase())] = read(n);
+  out.series = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => read(`chart-${i}`));
+  return out;
+}
+
+/** Re-run a callback when the OS colour scheme flips (charts redraw with the new tokens). */
+export function onSchemeChange(callback) {
+  if (typeof matchMedia !== 'function') return () => {};
+  const mq = matchMedia('(prefers-color-scheme: light)');
+  const handler = () => callback(tokens());
+  mq.addEventListener('change', handler);
+  return () => mq.removeEventListener('change', handler);
+}
 
 /**
  * @param {{
@@ -67,7 +111,9 @@ function prefersReducedMotion() {
  *   badges?: BadgeSpec[],
  *   kpis?: KpiSpec[],
  *   tour?: TourStep[],
- *   mainSelector?: string
+ *   mainSelector?: string,
+ *   theme?: ThemeName,
+ *   accent?: 'primary'|'secondary'
  * }} config
  */
 export function mountExecShell(config) {
@@ -79,8 +125,12 @@ export function mountExecShell(config) {
     badges = defaultBadges(),
     kpis = [],
     tour = [],
-    mainSelector = '#demo-root'
+    mainSelector = '#demo-root',
+    theme,
+    accent
   } = config || {};
+
+  if (theme) applyTheme(theme, accent);
 
   if (!title || !tagline || !repo) {
     throw new Error('mountExecShell: title, tagline and repo are required.');
