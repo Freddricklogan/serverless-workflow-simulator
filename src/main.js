@@ -165,6 +165,7 @@ async function boot() {
   loadPreset('api');
 
   shell = mountExecShell({
+  theme: 'graphite',
     title: 'Serverless Workflow Simulator',
     tagline: 'Amazon States Language executed by a tested engine — Task, Choice, Wait, Parallel, Map, Retry and Catch — with seeded latency and failure injection, an Erlang-B throttling estimate, and a per-execution cost built from the AWS Price List API. Paste your own state machine.',
     repo: 'https://github.com/Freddricklogan/serverless-workflow-simulator',

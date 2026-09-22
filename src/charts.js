@@ -1,7 +1,8 @@
+import { tokens } from './exec-shell.js';
 /** Chart.js wiring. Every function here touches the DOM; none of them compute. */
 const GRID = 'rgba(34,48,77,.6)';
-const TICK = '#8b98b0';
-export const PALETTE = ['#58A6FF', '#3fb950', '#d29922', '#f85149', '#d2a8ff', '#79c0ff', '#ffa657', '#8b98b0'];
+const TICK = tokens().muted;
+export const PALETTE = [tokens().accent, tokens().ok, tokens().warn, tokens().danger, tokens().series[4], tokens().accent2, tokens().series[5], tokens().muted];
 
 export async function loadChartLib() {
   if (globalThis.Chart) return globalThis.Chart;
@@ -35,14 +36,14 @@ export function makeCharts(Chart) {
     donut(canvas, labels, values, colours = null) {
       mount(canvas, {
         type: 'doughnut',
-        data: { labels, datasets: [{ data: values, backgroundColor: colours ?? labels.map((_, i) => PALETTE[i % PALETTE.length]), borderColor: '#111a2e', borderWidth: 2 }] },
+        data: { labels, datasets: [{ data: values, backgroundColor: colours ?? labels.map((_, i) => PALETTE[i % PALETTE.length]), borderColor: tokens().panel, borderWidth: 2 }] },
         options: { responsive: true, maintainAspectRatio: false, animation: false, cutout: '55%', plugins: { legend: { position: 'right', labels: { color: TICK, boxWidth: 12 } } } }
       });
     },
     scatter(canvas, points) {
       mount(canvas, {
         type: 'scatter',
-        data: { datasets: [{ data: points.map((p) => ({ x: p.risk, y: p.ret, label: p.symbol })), backgroundColor: '#58A6FF', pointRadius: 5 }] },
+        data: { datasets: [{ data: points.map((p) => ({ x: p.risk, y: p.ret, label: p.symbol })), backgroundColor: tokens().accent, pointRadius: 5 }] },
         options: { ...base('Annualised volatility (%)', 'Annualised return (%)'), plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw.label}: σ ${c.raw.x.toFixed(1)}%, μ ${c.raw.y.toFixed(1)}%` } } } }
       });
     },
@@ -53,14 +54,14 @@ export function makeCharts(Chart) {
         options: base(xTitle, yTitle, series.length > 1)
       });
     },
-    bars(canvas, labels, values, yTitle, colour = '#58A6FF') {
+    bars(canvas, labels, values, yTitle, colour = tokens().accent) {
       mount(canvas, {
         type: 'bar',
         data: { labels, datasets: [{ data: values, backgroundColor: `${colour}99`, borderColor: colour, borderWidth: 1 }] },
         options: { ...base('', yTitle), indexAxis: 'y' }
       });
     },
-    histogram(canvas, { edges, counts }, xTitle, colour = '#58A6FF') {
+    histogram(canvas, { edges, counts }, xTitle, colour = tokens().accent) {
       mount(canvas, {
         type: 'bar',
         data: { labels: edges.slice(0, -1).map((e) => Math.round(e).toLocaleString()), datasets: [{ data: counts, backgroundColor: `${colour}99`, borderColor: colour, borderWidth: 1 }] },
