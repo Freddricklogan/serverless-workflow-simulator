@@ -4,7 +4,7 @@
  * For each theme (dark block and its light block) the pairs below are measured:
  *   text, muted            vs bg, panel, panel-2      ≥ 4.5  (body text)
  *   primary, secondary     vs bg, panel, panel-2      ≥ 4.5  (links are text)
- *   ok, warn, danger       vs bg, panel, panel-2      ≥ 3.0  (large KPI values, indicators)
+ *   ok, warn, danger       vs bg, panel, panel-2      ≥ 4.5  (demos use them as text colours)
  *   chart-1..8             vs bg, panel               ≥ 3.0  (graphics)
  *   on-accent              vs primary, secondary      ≥ 4.5  (button labels; both accents can be primary)
  *   border                 vs bg                      ≥ 1.2  (visible edge; informational)
@@ -31,7 +31,7 @@ for (const [scheme, text] of Object.entries(parts)) {
 }
 const RULES = [
   [['text', 'muted', 'primary', 'secondary'], ['bg', 'panel', 'panel-2'], 4.5],
-  [['ok', 'warn', 'danger'], ['bg', 'panel', 'panel-2'], 3.0],
+  [['ok', 'warn', 'danger'], ['bg', 'panel', 'panel-2'], 4.5],
   [['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5', 'chart-6', 'chart-7', 'chart-8'], ['bg', 'panel'], 3.0],
   [['on-accent'], ['primary', 'secondary'], 4.5],
   [['border'], ['bg'], 1.2]
