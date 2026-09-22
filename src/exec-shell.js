@@ -61,7 +61,7 @@ function prefersReducedMotion() {
 
 export const THEMES = ['signal', 'graphite', 'ember', 'plum', 'forest', 'midnight'];
 /** Outside a browser (unit tests) tokens() returns the midnight dark palette so logic modules stay testable. */
-const NODE_TOKENS = { bg: '#0b1220', panel: '#111a2e', panel2: '#16223a', border: '#22304d', text: '#e6edf3', muted: '#8b98b0', accent: '#d4a95a', accent2: '#58a6ff', ok: '#3fb950', warn: '#d29922', danger: '#f85149', onAccent: '#0b1220', series: ['#d4a95a', '#58a6ff', '#3fb950', '#f85149', '#d2a8ff', '#ffa657', '#79c0ff', '#f2cc60'] };
+const NODE_TOKENS = { bg: '#0b1220', panel: '#111a2e', panel2: '#16223a', border: '#22304d', text: '#e6edf3', muted: '#8b98b0', accent: '#58a6ff', accent2: '#d4a95a', ok: '#3fb950', warn: '#d29922', danger: '#f85149', onAccent: '#0b1220', series: ['#58a6ff', '#d4a95a', '#3fb950', '#f85149', '#d2a8ff', '#ffa657', '#79c0ff', '#f2cc60'] };
 const TOKEN_NAMES = ['bg', 'panel', 'panel-2', 'border', 'text', 'muted', 'accent', 'accent-2', 'ok', 'warn', 'danger', 'on-accent'];
 
 /**
@@ -93,13 +93,53 @@ export function tokens() {
   return out;
 }
 
-/** Re-run a callback when the OS colour scheme flips (charts redraw with the new tokens). */
+const SCHEME_KEY = 'exec-scheme';
+const schemeListeners = new Set();
+
+/** 'dark' (default) or 'light' — light is opt-in through the header toggle and remembered per site. */
+export function currentScheme() {
+  return document.documentElement.dataset.scheme === 'light' ? 'light' : 'dark';
+}
+
+/** Apply a scheme; `persist` writes the choice to localStorage (the toggle does, first paint does not). */
+export function applyScheme(scheme, persist = true) {
+  if (scheme === 'light') document.documentElement.dataset.scheme = 'light';
+  else delete document.documentElement.dataset.scheme;
+  if (persist) {
+    try { localStorage.setItem(SCHEME_KEY, scheme); } catch { /* storage unavailable: the choice lasts for the page */ }
+  }
+  const t = tokens();
+  for (const cb of schemeListeners) cb(t, scheme);
+}
+
+/** Restore the remembered scheme (dark when nothing is stored). Called by mountExecShell. */
+export function restoreScheme() {
+  let stored = null;
+  try { stored = localStorage.getItem(SCHEME_KEY); } catch { /* ignore */ }
+  applyScheme(stored === 'light' ? 'light' : 'dark', false);
+}
+
+/** Re-run a callback when the scheme toggles (charts redraw with the new tokens). */
 export function onSchemeChange(callback) {
-  if (typeof matchMedia !== 'function') return () => {};
-  const mq = matchMedia('(prefers-color-scheme: light)');
-  const handler = () => callback(tokens());
-  mq.addEventListener('change', handler);
-  return () => mq.removeEventListener('change', handler);
+  schemeListeners.add(callback);
+  return () => schemeListeners.delete(callback);
+}
+
+const SUN = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const MOON = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+
+function buildSchemeToggle() {
+  const btn = el('button', { type: 'button', class: 'exec-btn exec-btn--icon', id: 'exec-scheme-toggle' });
+  const render = () => {
+    const light = currentScheme() === 'light';
+    btn.innerHTML = light ? MOON : SUN;
+    btn.setAttribute('aria-label', light ? 'Switch to the dark palette' : 'Switch to the light palette');
+    btn.title = btn.getAttribute('aria-label');
+  };
+  btn.addEventListener('click', () => applyScheme(currentScheme() === 'light' ? 'dark' : 'light'));
+  schemeListeners.add(render);
+  render();
+  return btn;
 }
 
 /**
@@ -131,6 +171,7 @@ export function mountExecShell(config) {
   } = config || {};
 
   if (theme) applyTheme(theme, accent);
+  restoreScheme();
 
   if (!title || !tagline || !repo) {
     throw new Error('mountExecShell: title, tagline and repo are required.');
@@ -148,7 +189,7 @@ export function mountExecShell(config) {
     id: 'exec-tour-start'
   }, ['Take the 30-second tour']);
 
-  const header = buildHeader({ title, tagline, repo, pagesUrl, badges, tourBtn });
+  const header = buildHeader({ title, tagline, repo, pagesUrl, badges, tourBtn, schemeToggle: buildSchemeToggle() });
   const { strip, cells } = buildKpiStrip(kpis);
   const footer = buildFooter({ repo, pagesUrl });
 
@@ -197,7 +238,7 @@ function defaultBadges() {
   ];
 }
 
-function buildHeader({ title, tagline, repo, pagesUrl, badges, tourBtn }) {
+function buildHeader({ title, tagline, repo, pagesUrl, badges, tourBtn, schemeToggle }) {
   const badgeList = el(
     'ul',
     { class: 'exec-badges', 'aria-label': 'Project attributes' },
@@ -235,7 +276,7 @@ function buildHeader({ title, tagline, repo, pagesUrl, badges, tourBtn }) {
         el('p', { class: 'exec-header__tagline', text: tagline }),
         badgeList
       ]),
-      el('div', { class: 'exec-header__actions' }, [tourBtn, ...links])
+      el('div', { class: 'exec-header__actions' }, [tourBtn, ...links, schemeToggle])
     ])
   ]);
 }

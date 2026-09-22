@@ -1,9 +1,11 @@
 /* ==========================================================================
    Executive Shell — portfolio standard v1 (static demo chrome)
    Header + badge row + KPI strip + guided tour overlay + footer.
-   Six category palettes selected by data-theme on <html> (default: midnight),
-   each with a light variant under prefers-color-scheme: light. Only colour
-   changes between palettes — type, spacing and structure are fixed.
+   Six category palettes selected by data-theme on <html> (default: midnight).
+   Dark is the default; each palette has a light variant that the header's
+   sun/moon toggle enables (data-scheme="light" on <html>, remembered in
+   localStorage). Only colour changes between palettes — type, spacing and
+   structure are fixed.
    Every token pair is checked for WCAG AA by contrast-check (mjs/py).
    Zero dependencies.
    ========================================================================== */
@@ -19,14 +21,14 @@
   --border: #22304d;
   --text: #e6edf3;
   --muted: #9da9c0;
-  --primary: #d4a95a;
-  --secondary: #58a6ff;
+  --primary: #58a6ff;
+  --secondary: #d4a95a;
   --ok: #3fb950;
   --warn: #d29922;
   --danger: #f85149;
   --on-accent: #0b1220;
-  --chart-1: #d4a95a;
-  --chart-2: #58a6ff;
+  --chart-1: #58a6ff;
+  --chart-2: #d4a95a;
   --chart-3: #3fb950;
   --chart-4: #f85149;
   --chart-5: #d2a8ff;
@@ -144,139 +146,139 @@
   --chart-7: #fde68a;
   --chart-8: #f9a8d4;
 }
-@media (prefers-color-scheme: light) {  :root,
-  [data-theme="midnight"] {
-    --bg: #f6f8fb;
-    --panel: #ffffff;
-    --panel-2: #eaf0f8;
-    --border: #c9d4e3;
-    --text: #0b1220;
-    --muted: #4a5568;
-    --primary: #7a5a20;
-    --secondary: #1d4ed8;
-    --ok: #166534;
-    --warn: #92400e;
-    --danger: #b91c1c;
-    --on-accent: #ffffff;
-    --chart-1: #7a5a20;
-    --chart-2: #1d4ed8;
-    --chart-3: #15803d;
-    --chart-4: #b91c1c;
-    --chart-5: #6d28d9;
-    --chart-6: #c2410c;
-    --chart-7: #0e7490;
-    --chart-8: #a16207;
-  }
-  [data-theme="signal"] {
-    --bg: #f8fafc;
-    --panel: #ffffff;
-    --panel-2: #eef2ff;
-    --border: #cbd5e1;
-    --text: #0f172a;
-    --muted: #475569;
-    --primary: #4f46e5;
-    --secondary: #0f766e;
-    --ok: #166534;
-    --warn: #a34a03;
-    --danger: #be123c;
-    --on-accent: #ffffff;
-    --chart-1: #4f46e5;
-    --chart-2: #0f766e;
-    --chart-3: #be185d;
-    --chart-4: #b45309;
-    --chart-5: #1d4ed8;
-    --chart-6: #4d7c0f;
-    --chart-7: #c2410c;
-    --chart-8: #6d28d9;
-  }
-  [data-theme="graphite"] {
-    --bg: #f6f7f9;
-    --panel: #ffffff;
-    --panel-2: #eef1f5;
-    --border: #cfd6df;
-    --text: #0b0f14;
-    --muted: #4b5563;
-    --primary: #9a4507;
-    --secondary: #3f6212;
-    --ok: #3f6212;
-    --warn: #9a4507;
-    --danger: #b91c1c;
-    --on-accent: #ffffff;
-    --chart-1: #9a4507;
-    --chart-2: #3f6212;
-    --chart-3: #b91c1c;
-    --chart-4: #0369a1;
-    --chart-5: #7e22ce;
-    --chart-6: #c2410c;
-    --chart-7: #047857;
-    --chart-8: #9d174d;
-  }
-  [data-theme="ember"] {
-    --bg: #faf6f1;
-    --panel: #ffffff;
-    --panel-2: #f3ece3;
-    --border: #d9cfc3;
-    --text: #1a1614;
-    --muted: #5b514a;
-    --primary: #8b5e00;
-    --secondary: #b3401d;
-    --ok: #2f6f3a;
-    --warn: #8b5e00;
-    --danger: #b3261e;
-    --on-accent: #ffffff;
-    --chart-1: #8b5e00;
-    --chart-2: #b3401d;
-    --chart-3: #2f6f3a;
-    --chart-4: #1f5f8b;
-    --chart-5: #6b3fa0;
-    --chart-6: #7a6400;
-    --chart-7: #9d174d;
-    --chart-8: #0e7490;
-  }
-  [data-theme="plum"] {
-    --bg: #faf7fd;
-    --panel: #ffffff;
-    --panel-2: #f1eafa;
-    --border: #d6c9e6;
-    --text: #1a1024;
-    --muted: #5b4b6e;
-    --primary: #7e22ce;
-    --secondary: #047857;
-    --ok: #047857;
-    --warn: #a34a03;
-    --danger: #be123c;
-    --on-accent: #ffffff;
-    --chart-1: #7e22ce;
-    --chart-2: #047857;
-    --chart-3: #be185d;
-    --chart-4: #b45309;
-    --chart-5: #0369a1;
-    --chart-6: #9f1239;
-    --chart-7: #a16207;
-    --chart-8: #15803d;
-  }
-  [data-theme="forest"] {
-    --bg: #f5faf7;
-    --panel: #ffffff;
-    --panel-2: #e9f3ed;
-    --border: #c9dccf;
-    --text: #0d1b16;
-    --muted: #4a5d53;
-    --primary: #3f6212;
-    --secondary: #0369a1;
-    --ok: #166534;
-    --warn: #854d0e;
-    --danger: #b91c1c;
-    --on-accent: #ffffff;
-    --chart-1: #3f6212;
-    --chart-2: #0369a1;
-    --chart-3: #be185d;
-    --chart-4: #a16207;
-    --chart-5: #c2410c;
-    --chart-6: #6d28d9;
-    --chart-7: #a16207;
-    --chart-8: #9d174d;
-  }
+/* Light variants: opt-in through the header toggle (data-scheme="light" on <html>, persisted). */
+[data-scheme="light"],
+[data-scheme="light"][data-theme="midnight"] {
+  --bg: #f6f8fb;
+  --panel: #ffffff;
+  --panel-2: #eaf0f8;
+  --border: #c9d4e3;
+  --text: #0b1220;
+  --muted: #4a5568;
+  --primary: #1d4ed8;
+  --secondary: #7a5a20;
+  --ok: #166534;
+  --warn: #92400e;
+  --danger: #b91c1c;
+  --on-accent: #ffffff;
+  --chart-1: #1d4ed8;
+  --chart-2: #7a5a20;
+  --chart-3: #15803d;
+  --chart-4: #b91c1c;
+  --chart-5: #6d28d9;
+  --chart-6: #c2410c;
+  --chart-7: #0e7490;
+  --chart-8: #a16207;
+}
+[data-scheme="light"][data-theme="signal"] {
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --panel-2: #eef2ff;
+  --border: #cbd5e1;
+  --text: #0f172a;
+  --muted: #475569;
+  --primary: #4f46e5;
+  --secondary: #0f766e;
+  --ok: #166534;
+  --warn: #a34a03;
+  --danger: #be123c;
+  --on-accent: #ffffff;
+  --chart-1: #4f46e5;
+  --chart-2: #0f766e;
+  --chart-3: #be185d;
+  --chart-4: #b45309;
+  --chart-5: #1d4ed8;
+  --chart-6: #4d7c0f;
+  --chart-7: #c2410c;
+  --chart-8: #6d28d9;
+}
+[data-scheme="light"][data-theme="graphite"] {
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --panel-2: #eef1f5;
+  --border: #cfd6df;
+  --text: #0b0f14;
+  --muted: #4b5563;
+  --primary: #9a4507;
+  --secondary: #3f6212;
+  --ok: #3f6212;
+  --warn: #9a4507;
+  --danger: #b91c1c;
+  --on-accent: #ffffff;
+  --chart-1: #9a4507;
+  --chart-2: #3f6212;
+  --chart-3: #b91c1c;
+  --chart-4: #0369a1;
+  --chart-5: #7e22ce;
+  --chart-6: #c2410c;
+  --chart-7: #047857;
+  --chart-8: #9d174d;
+}
+[data-scheme="light"][data-theme="ember"] {
+  --bg: #faf6f1;
+  --panel: #ffffff;
+  --panel-2: #f3ece3;
+  --border: #d9cfc3;
+  --text: #1a1614;
+  --muted: #5b514a;
+  --primary: #8b5e00;
+  --secondary: #b3401d;
+  --ok: #2f6f3a;
+  --warn: #8b5e00;
+  --danger: #b3261e;
+  --on-accent: #ffffff;
+  --chart-1: #8b5e00;
+  --chart-2: #b3401d;
+  --chart-3: #2f6f3a;
+  --chart-4: #1f5f8b;
+  --chart-5: #6b3fa0;
+  --chart-6: #7a6400;
+  --chart-7: #9d174d;
+  --chart-8: #0e7490;
+}
+[data-scheme="light"][data-theme="plum"] {
+  --bg: #faf7fd;
+  --panel: #ffffff;
+  --panel-2: #f1eafa;
+  --border: #d6c9e6;
+  --text: #1a1024;
+  --muted: #5b4b6e;
+  --primary: #7e22ce;
+  --secondary: #047857;
+  --ok: #047857;
+  --warn: #a34a03;
+  --danger: #be123c;
+  --on-accent: #ffffff;
+  --chart-1: #7e22ce;
+  --chart-2: #047857;
+  --chart-3: #be185d;
+  --chart-4: #b45309;
+  --chart-5: #0369a1;
+  --chart-6: #9f1239;
+  --chart-7: #a16207;
+  --chart-8: #15803d;
+}
+[data-scheme="light"][data-theme="forest"] {
+  --bg: #f5faf7;
+  --panel: #ffffff;
+  --panel-2: #e9f3ed;
+  --border: #c9dccf;
+  --text: #0d1b16;
+  --muted: #4a5d53;
+  --primary: #3f6212;
+  --secondary: #0369a1;
+  --ok: #166534;
+  --warn: #854d0e;
+  --danger: #b91c1c;
+  --on-accent: #ffffff;
+  --chart-1: #3f6212;
+  --chart-2: #0369a1;
+  --chart-3: #be185d;
+  --chart-4: #a16207;
+  --chart-5: #c2410c;
+  --chart-6: #6d28d9;
+  --chart-7: #a16207;
+  --chart-8: #9d174d;
 }
 /* --- derived tokens (never edit per repo) --------------------------------- */
 :root {
@@ -305,10 +307,8 @@
   --accent-2: var(--primary);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
-  }
+[data-scheme="light"] {
+  --shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
 }
 
 /* --- base ---------------------------------------------------------------- */
@@ -323,10 +323,8 @@ html {
   color-scheme: dark;
 }
 
-@media (prefers-color-scheme: light) {
-  html {
-    color-scheme: light;
-  }
+html[data-scheme="light"] {
+  color-scheme: light;
 }
 
 body {
@@ -490,6 +488,11 @@ a {
 .exec-btn:hover {
   background: var(--btn-hover);
   border-color: var(--accent);
+}
+
+.exec-btn--icon {
+  padding: 9px 10px;
+  line-height: 0;
 }
 
 .exec-btn--primary {

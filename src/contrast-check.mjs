@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* global process, console, URL */
 /** WCAG AA contrast check for every palette in exec-shell.css.
- * For each theme (dark block and its light block) the pairs below are measured:
+ * For each theme (its dark block and its [data-scheme="light"] block) the pairs below are measured:
  *   text, muted            vs bg, panel, panel-2      ≥ 4.5  (body text)
  *   primary, secondary     vs bg, panel, panel-2      ≥ 4.5  (links are text)
  *   ok, warn, danger       vs bg, panel, panel-2      ≥ 4.5  (demos use them as text colours)
@@ -18,16 +18,11 @@ const lum = (hex) => {
 };
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)]; return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
 
-// Split the light media block from the dark rules, then read every [data-theme="x"] / :root block.
-const lightStart = css.indexOf('@media (prefers-color-scheme: light)');
-const lightEnd = css.indexOf('\n}\n', lightStart) + 3;
-const parts = { dark: css.slice(0, lightStart) + css.slice(lightEnd), light: css.slice(lightStart, lightEnd) };
+// Dark blocks are [data-theme="x"] rules; light blocks carry [data-scheme="light"] in the selector.
 const themes = {};
-for (const [scheme, text] of Object.entries(parts)) {
-  for (const m of text.matchAll(/\[data-theme="([a-z]+)"\]\s*\{([^}]*)\}/g)) {
-    const tokens = Object.fromEntries([...m[2].matchAll(/--([a-z0-9-]+):\s*(#[0-9a-fA-F]{6})/g)].map((t) => [t[1], t[2].toLowerCase()]));
-    if (Object.keys(tokens).length) (themes[m[1]] ??= {})[scheme] = tokens;
-  }
+for (const m of css.matchAll(/((?:\[data-scheme="light"\])?)\s*\[data-theme="([a-z]+)"\]\s*\{([^}]*)\}/g)) {
+  const tokens = Object.fromEntries([...m[3].matchAll(/--([a-z0-9-]+):\s*(#[0-9a-fA-F]{6})/g)].map((t) => [t[1], t[2].toLowerCase()]));
+  if (Object.keys(tokens).length) (themes[m[2]] ??= {})[m[1] ? 'light' : 'dark'] = tokens;
 }
 const RULES = [
   [['text', 'muted', 'primary', 'secondary'], ['bg', 'panel', 'panel-2'], 4.5],
