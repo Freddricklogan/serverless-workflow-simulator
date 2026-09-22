@@ -20,6 +20,24 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  attribution:
+    name: Attribution check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: No tool attribution in the tree or the history
+        run: |
+          set -e
+          if git grep -iIE 'claude|\banthropic|co-authored-by|generated with|noreply@anthropic' -- . ':!*.lock' ':!**/vendor/**' ':!**/node_modules/**' ':!.github/workflows/*'; then
+            echo "::error::tool attribution found in tracked files"; exit 1; fi
+          if git log --all --format='%an <%ae>%n%cn <%ce>%n%B' | grep -iE 'claude|\banthropic|co-authored-by|generated with|noreply@anthropic'; then
+            echo "::error::tool attribution found in commit history"; exit 1; fi
+          for f in CLAUDE.md AGENTS.md .cursorrules .claude .cursor .github/copilot-instructions.md; do
+            [ -e "$f" ] && { echo "::error::$f must not be committed"; exit 1; }; done
+          echo "attribution check: clean"
+
   lint:
     name: Lint & validate
     runs-on: ubuntu-latest
