@@ -59,7 +59,7 @@ flowchart LR
     WF[("data/workflows.json<br/>5 ASL presets")]:::data
     PJ[("data/pricing.json<br/>11 rates, dated")]:::data
     PASTE[("pasted ASL definition<br/>validated locally")]:::data
-    subgraph PURE["Pure modules (17 tests, 99.38% stmts)"]
+    subgraph PURE["Pure modules (25 tests, 99.38% stmts)"]
       ASL["asl.js<br/>validate · execute · linearOrder"]:::service
       MODEL["model.js<br/>makeModel · executionCost · throttling"]:::service
       RNG["rng.js<br/>mulberry32"]:::service
