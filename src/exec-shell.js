@@ -59,6 +59,8 @@ function prefersReducedMotion() {
  * @typedef {'signal'|'graphite'|'ember'|'plum'|'forest'|'midnight'} ThemeName
  */
 
+import { centreTourCard, placeTourCard } from './tour-place.js';
+
 export const THEMES = ['signal', 'graphite', 'ember', 'plum', 'forest', 'midnight'];
 /** Outside a browser (unit tests) tokens() returns the midnight dark palette so logic modules stay testable. */
 const NODE_TOKENS = { bg: '#0b1220', panel: '#111a2e', panel2: '#16223a', border: '#22304d', text: '#e6edf3', muted: '#8b98b0', accent: '#58a6ff', accent2: '#d4a95a', ok: '#3fb950', warn: '#d29922', danger: '#f85149', onAccent: '#0b1220', series: ['#58a6ff', '#d4a95a', '#3fb950', '#f85149', '#d2a8ff', '#ffa657', '#79c0ff', '#f2cc60'] };
@@ -393,18 +395,35 @@ function buildTour(steps, tourBtn) {
         }
       }
     }
-    position(step);
+    await position(step);
   }
 
-  function position(step) {
+  /** Resolve once scrolling has stopped (two equal readings 50 ms apart, at most 900 ms). */
+  function scrollSettled() {
+    return new Promise((resolve) => {
+      let last = -1;
+      let waited = 0;
+      const tick = () => {
+        const y = window.scrollY;
+        if (y === last || waited >= 900) return resolve();
+        last = y;
+        waited += 50;
+        setTimeout(tick, 50);
+      };
+      setTimeout(tick, 50);
+    });
+  }
+
+  async function position(step) {
     const target = step.selector ? document.querySelector(step.selector) : null;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
     if (!target) {
       spot.style.display = 'none';
-      card.style.left = `${Math.max(16, (vw - card.offsetWidth) / 2)}px`;
-      card.style.top = `${Math.max(16, (vh - card.offsetHeight) / 2)}px`;
+      const c = centreTourCard({ vw, vh, cw: card.offsetWidth, ch: card.offsetHeight });
+      card.style.left = `${c.left}px`;
+      card.style.top = `${c.top}px`;
       return;
     }
 
@@ -412,6 +431,7 @@ function buildTour(steps, tourBtn) {
       block: 'center',
       behavior: prefersReducedMotion() ? 'auto' : 'smooth'
     });
+    await scrollSettled();
 
     const r = target.getBoundingClientRect();
     spot.style.display = '';
@@ -420,14 +440,15 @@ function buildTour(steps, tourBtn) {
     spot.style.width = `${r.width + 12}px`;
     spot.style.height = `${r.height + 12}px`;
 
-    const cw = card.offsetWidth || 360;
-    const ch = card.offsetHeight || 220;
-    let top = r.bottom + 16;
-    if (top + ch > vh - 12) top = Math.max(12, r.top - ch - 16);
-    let left = r.left;
-    if (left + cw > vw - 12) left = Math.max(12, vw - cw - 12);
-    card.style.left = `${Math.max(12, left)}px`;
-    card.style.top = `${Math.max(12, top)}px`;
+    const { left, top } = placeTourCard({
+      rect: r,
+      vw,
+      vh,
+      cw: card.offsetWidth || 360,
+      ch: card.offsetHeight || 220
+    });
+    card.style.left = `${left}px`;
+    card.style.top = `${top}px`;
   }
 
   function onKeydown(event) {
